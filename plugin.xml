@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="net.refractions.udig.catalog.ServiceExtension">
+      <service
+            class="net.refractions.udig.catalog.neo4j.Neo4jSpatialServiceExtension"
+            id="net.refractions.udig.catalog.neo4j.spatial.service">
+      </service>
+   </extension>
+   <extension
+         point="net.refractions.udig.catalog.ui.fileFormat">
+      <fileService
+            fileExtension="*.id"
+            name="Neo4j Database">
+      </fileService>
+   </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            class="net.refractions.udig.catalog.neo4j.shpwizard.ShpImportWizard"
+            icon="icons/obj16/worldimage_obj.gif"
+            id="net.refractions.udig.catalog.neo4j.shpwizard"
+            name="Import a SHP file to a Neo4j Database">
+      </wizard>
+   </extension>
+   <extension
+         point="net.refractions.udig.ui.operation">
+      <operation
+            class="net.refractions.udig.catalog.neo4j.RefreshNeo4jSpatialServiceOp"
+            enablesFor="1"
+            id="net.refractions.udig.catalog.neo4j.serviceRefreshOp"
+            name="Refresh"
+            targetClass="net.refractions.udig.catalog.neo4j.Neo4jSpatialService">
+         <enablement></enablement>
+      </operation>
+      <operation
+            class="net.refractions.udig.catalog.neo4j.GenerateLineStringNetworkOp"
+            enablesFor="1"
+            id="net.refractions.udig.catalog.neo4j.generateLineNetworkOp"
+            name="Create Line Network"
+            targetClass="net.refractions.udig.catalog.neo4j.Neo4jSpatialGeoResource">
+         <enablement></enablement>
+      </operation>
+      <operation
+            class="net.refractions.udig.catalog.neo4j.DeleteNeo4jSpatialLayerOp"
+            enablesFor="1"
+            id="net.refractions.udig.catalog.neo4j.deleteLayerOp"
+            name="Delete from Database"
+            targetClass="net.refractions.udig.catalog.neo4j.Neo4jSpatialGeoResource">
+         <enablement></enablement>
+      </operation>
+   </extension>
+
+</plugin>
