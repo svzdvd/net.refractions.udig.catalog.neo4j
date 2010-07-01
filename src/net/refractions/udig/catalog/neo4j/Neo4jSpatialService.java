@@ -114,18 +114,13 @@ public class Neo4jSpatialService extends IService {
     
     protected Neo4jSpatialDataStore getDataStore(IProgressMonitor monitor) {
     	if (dataStore == null) {
-    		Neo4jSpatialDataStoreFactory dsf = new Neo4jSpatialDataStoreFactory();
-    		if (dsf.canProcess(params)) {
-    			try {
-    				dataStore = (Neo4jSpatialDataStore) dsf.createDataStore(params);
-    				Activator.getDefault().registerOpenDataStore(dataStore);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    error = e;
-                }
-    		}
-            
-    		fireChangeEvent(monitor);
+    		try {
+    			dataStore = Activator.getDefault().getDataStore(params);
+        		fireChangeEvent(monitor);
+            } catch (IOException e) {
+            	e.printStackTrace();
+                error = e;
+            }
         }
         return dataStore;
     }

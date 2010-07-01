@@ -1,12 +1,15 @@
 package net.refractions.udig.catalog.neo4j.shpwizard;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
+import net.refractions.udig.catalog.URLUtils;
 import net.refractions.udig.catalog.neo4j.Activator;
+import net.refractions.udig.catalog.neo4j.ProgressMonitorWrapper;
 import net.refractions.udig.ui.ExceptionDetailsDialog;
 import net.refractions.udig.ui.PlatformGIS;
 
@@ -19,11 +22,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.geotools.data.shapefile.shp.ShapefileException;
-import org.neo4j.gis.spatial.ImporterListener;
 import org.neo4j.gis.spatial.ShapefileImporter;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
+import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStoreFactory;
 
 
 /**
@@ -61,7 +62,7 @@ public class ShpImportWizard extends Wizard implements INewWizard {
     public boolean performFinish() {
         // run with backgroundable progress monitoring
         IRunnableWithProgress operation = new IRunnableWithProgress() {
-            public void run(final IProgressMonitor pm) throws InvocationTargetException, InterruptedException {
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
     	        String shpPath = mainPage.getShpFile();
     	        
     	        // remove extension
@@ -72,43 +73,24 @@ public class ShpImportWizard extends Wizard implements INewWizard {
     	        	layerName = shpPath.substring(shpPath.lastIndexOf(File.separator) + 1);
     	        }
            	
-        		GraphDatabaseService database = new EmbeddedGraphDatabase(mainPage.getNeo4jDir());
-        		try {
-        			int commitInterval = 1000;
-        	        ShapefileImporter importer = new ShapefileImporter(database, commitInterval);
-        	        
-        	        importer.setListener(new ImporterListener() {
-						public void begin(int count) {
-							pm.beginTask("Importing...", count);
-						}
-
-						public void done() {
-							pm.done();
-						}
-
-						public void worked(int committedSinceLastNotification) {
-							pm.worked(committedSinceLastNotification);
-						}
-        	        });
-        	        
-        	        try {
-						importer.importFile(shpPath, layerName);
-					} catch (ShapefileException e) {
-	                    e.printStackTrace();
-	                    String message = "An error occurred while reading the ShapeFile";
-	                    ExceptionDetailsDialog.openError(null, message, IStatus.ERROR, Activator.ID, e);
-					} catch (FileNotFoundException e) {
-	                    e.printStackTrace();
-	                    String message = "An error occurred while importing the ShapeFile";
-	                    ExceptionDetailsDialog.openError(null, message, IStatus.ERROR, Activator.ID, e);
-					} catch (IOException e) {
-	                    e.printStackTrace();
-	                    String message = "An error occurred while importing the ShapeFile";
-	                    ExceptionDetailsDialog.openError(null, message, IStatus.ERROR, Activator.ID, e);
-					}
-        	    } finally {
-        			database.shutdown();
-        		}
+    	        String neo4jPath = mainPage.getNeo4jDir();
+    	        if (!neo4jPath.endsWith(File.separator)) {
+    	        	neo4jPath += File.separator;
+    	        }
+    	        neo4jPath += "neostore.id";
+    	    
+    	        try {
+        	        Map<String,Serializable> params = new HashMap<String,Serializable>();
+        	        params.put(Neo4jSpatialDataStoreFactory.URLP.key, URLUtils.fileToURL(new File(neo4jPath)));
+    	        	
+        	        Neo4jSpatialDataStore dataStore = Activator.getDefault().getDataStore(params);
+            		ShapefileImporter importer = new ShapefileImporter(dataStore.getSpatialDatabaseService().getDatabase(), new ProgressMonitorWrapper("Importing...", monitor));
+        	    	importer.importFile(shpPath, layerName);
+				} catch (Throwable e) {
+					e.printStackTrace();
+	                String message = "An error occurred while reading the ShapeFile";
+	                ExceptionDetailsDialog.openError(null, message, IStatus.ERROR, Activator.ID, e);
+				}
             }
         };
         PlatformGIS.runInProgressDialog("Importing a SHP file to a Neo4j Database", true, operation, true);

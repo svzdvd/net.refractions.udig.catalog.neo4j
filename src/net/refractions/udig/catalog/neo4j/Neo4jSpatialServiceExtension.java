@@ -1,6 +1,8 @@
 package net.refractions.udig.catalog.neo4j;
 
+import java.awt.RenderingHints.Key;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import net.refractions.udig.catalog.AbstractDataStoreServiceExtension;
 import net.refractions.udig.catalog.IService;
 import net.refractions.udig.catalog.URLUtils;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStoreFactory;
 
@@ -75,15 +78,41 @@ public class Neo4jSpatialServiceExtension extends AbstractDataStoreServiceExtens
 	// Private methods
 	
 	protected DataStoreFactorySpi getDataStoreFactory() {
-        if (dataStoreFactory == null) {
-        	dataStoreFactory = new Neo4jSpatialDataStoreFactory();
-        }
+		return new DataStoreFactorySpi() {
+	        private Neo4jSpatialDataStoreFactory dataStoreFactory = new Neo4jSpatialDataStoreFactory();
 
-        return dataStoreFactory;
+			public DataStore createDataStore(Map<String, Serializable> params) throws IOException {
+				return Activator.getDefault().getDataStore(params);
+			}
+
+			public DataStore createNewDataStore(Map<String, Serializable> params) throws IOException {
+				// TODO
+				throw new UnsupportedOperationException();
+			}
+
+			public boolean canProcess(Map<String, Serializable> params) {
+				return dataStoreFactory.canProcess(params);
+			}
+
+			public String getDescription() {
+				return dataStoreFactory.getDescription();
+			}
+
+			public String getDisplayName() {
+				return dataStoreFactory.getDisplayName();
+			}
+
+			public Param[] getParametersInfo() {
+				return dataStoreFactory.getParametersInfo();
+			}
+
+			public boolean isAvailable() {
+				return dataStoreFactory.isAvailable();
+			}
+
+			public Map<Key, ?> getImplementationHints() {
+				return dataStoreFactory.getImplementationHints();
+			}
+		};
 	}
-	
-	
-	// Attributes
-
-	private Neo4jSpatialDataStoreFactory dataStoreFactory;
 }

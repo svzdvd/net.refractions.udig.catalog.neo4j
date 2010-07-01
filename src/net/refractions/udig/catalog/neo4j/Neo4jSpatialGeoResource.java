@@ -8,6 +8,7 @@ import net.refractions.udig.catalog.ID;
 import net.refractions.udig.catalog.IGeoResource;
 import net.refractions.udig.catalog.IGeoResourceInfo;
 import net.refractions.udig.catalog.IService;
+import net.refractions.udig.catalog.URLUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.geotools.data.FeatureSource;
@@ -31,8 +32,8 @@ public class Neo4jSpatialGeoResource extends IGeoResource {
         this.typename = typename;
         
         try {
-            identifier= new URL(parent.getIdentifier().toString() + "#" + typename);
-            id = new ID(parent.getID(), typename);
+            identifier = new URL(parent.getIdentifier().toString() + "#" + URLUtils.cleanFilename(typename));
+            id = new ID(parent.getID(), URLUtils.cleanFilename(typename));
         } catch (MalformedURLException e) {
         	e.printStackTrace();
         	
