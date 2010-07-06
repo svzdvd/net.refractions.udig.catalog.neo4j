@@ -20,7 +20,6 @@ import net.refractions.udig.catalog.internal.ResolveChangeEvent;
 import net.refractions.udig.catalog.internal.ResolveDelta;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStoreFactory;
 
@@ -42,10 +41,6 @@ public class Neo4jSpatialService extends IService {
     // Methods
 
     public <T> T resolve(Class<T> adaptee, IProgressMonitor monitor) throws IOException {
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
-        
         if (adaptee == null) {
             throw new NullPointerException("No adaptor specified");
         }
@@ -84,20 +79,7 @@ public class Neo4jSpatialService extends IService {
     public Neo4jSpatialServiceInfo getInfo(IProgressMonitor monitor) throws IOException {
         return (Neo4jSpatialServiceInfo) super.getInfo(monitor);
     }
-    
-	protected IServiceInfo createInfo(IProgressMonitor monitor) throws IOException {
-		if (info == null) { 
-			Neo4jSpatialDataStore dataStore = getDataStore(monitor);
-            if (dataStore == null) {
-            	// could not connect
-            	return null;
-            }
-                	
-            info = new Neo4jSpatialServiceInfo(this);
-        }
-        return info;
-	}
-	
+    	
     public Map<String, Serializable> getConnectionParams() {
         return params;
     }
@@ -107,12 +89,12 @@ public class Neo4jSpatialService extends IService {
 		dataStore.clearCache();    	
 		resources = null;
 		
-		// TODO compare old and new resources
-		// fire an Event for every added or deleted resource
+		// TODO compare old and new resources and
+		// fire an Event for every added or deleted resource?
 		fireChangeEvent(monitor);
     }
     
-    protected Neo4jSpatialDataStore getDataStore(IProgressMonitor monitor) {
+    public Neo4jSpatialDataStore getDataStore(IProgressMonitor monitor) {
     	if (dataStore == null) {
     		try {
     			dataStore = Activator.getDefault().getDataStore(params);
@@ -123,16 +105,6 @@ public class Neo4jSpatialService extends IService {
             }
         }
         return dataStore;
-    }
-
-    private void fireChangeEvent(IProgressMonitor monitor) {
-        IResolveDelta delta = new ResolveDelta(this, IResolveDelta.Kind.CHANGED);
-        ResolveChangeEvent event = new ResolveChangeEvent(this, IResolveChangeEvent.Type.POST_CHANGE, delta);
-        
-        ICatalog catalog = parent(monitor);
-        if (catalog instanceof CatalogImpl) {
-            ((CatalogImpl) catalog).fire(event);
-        }
     }
     
     public Status getStatus() {
@@ -155,6 +127,32 @@ public class Neo4jSpatialService extends IService {
         Map<String, Serializable> parametersMap = getConnectionParams();
         URL url = (URL) parametersMap.get(Neo4jSpatialDataStoreFactory.URLP.key);
         return URLUtils.urlToFile(url);
+    }    
+    
+    
+    // Private methods
+    
+	protected IServiceInfo createInfo(IProgressMonitor monitor) throws IOException {
+		if (info == null) { 
+			Neo4jSpatialDataStore dataStore = getDataStore(monitor);
+            if (dataStore == null) {
+            	// could not connect
+            	return null;
+            }
+                	
+            info = new Neo4jSpatialServiceInfo(this);
+        }
+        return info;
+	}
+    
+    private void fireChangeEvent(IProgressMonitor monitor) {
+        IResolveDelta delta = new ResolveDelta(this, IResolveDelta.Kind.CHANGED);
+        ResolveChangeEvent event = new ResolveChangeEvent(this, IResolveChangeEvent.Type.POST_CHANGE, delta);
+        
+        ICatalog catalog = parent(monitor);
+        if (catalog instanceof CatalogImpl) {
+            ((CatalogImpl) catalog).fire(event);
+        }
     }    
     
     

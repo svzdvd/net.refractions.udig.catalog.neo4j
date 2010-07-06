@@ -35,7 +35,7 @@
          <enablement></enablement>
       </operation>
       <operation
-            class="net.refractions.udig.catalog.neo4j.GenerateLineStringNetworkOp"
+            class="net.refractions.udig.catalog.neo4j.findpath.GenerateLineStringNetworkOp"
             enablesFor="1"
             id="net.refractions.udig.catalog.neo4j.generateLineNetworkOp"
             name="Create Line Network"
@@ -50,6 +50,33 @@
             targetClass="net.refractions.udig.catalog.neo4j.Neo4jSpatialGeoResource">
          <enablement></enablement>
       </operation>
+   </extension>
+   <extension
+         point="net.refractions.udig.mapgraphic.mapgraphic">
+      <mapGraphic
+            class="net.refractions.udig.catalog.neo4j.findpath.GraphMapGraphic"
+            icon="icons/etool16/path.png"
+            id="net.refractions.udig.catalog.neo4j.mapGraphic"
+            name="Neo4j Network">
+      </mapGraphic>
+   </extension>
+   <extension
+         point="net.refractions.udig.project.ui.tool">
+      <modalTool
+            class="net.refractions.udig.catalog.neo4j.findpath.WayPointTool"
+            icon="icons/etool16/graph.png"
+            id="net.refractions.udig.catalog.neo4j.waypointtool"
+            name="Add Way Point"
+            onToolbar="true">
+      </modalTool>
+      <actionTool
+            class="net.refractions.udig.catalog.neo4j.findpath.FindPathTool"
+            icon="icons/etool16/path.png"
+            id="net.refractions.udig.catalog.neo4j.findpathtool"
+            name="Find Path"
+            onToolbar="true">
+         <enablement></enablement>
+      </actionTool>
    </extension>
 
 </plugin>

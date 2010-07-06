@@ -42,7 +42,7 @@ public class Neo4jSpatialGeoResource extends IGeoResource {
     }	
 	
     
-    // Methods
+    // Public methods
     
     public URL getIdentifier() {
         return identifier;
@@ -98,10 +98,6 @@ public class Neo4jSpatialGeoResource extends IGeoResource {
         return super.resolve(adaptee, monitor);
     }
 
-    private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource(IProgressMonitor monitor) throws IOException {
-        return parent.getDataStore(monitor).getFeatureSource(typename);
-    }
-
     public Style style(IProgressMonitor monitor) {
     	// don't return a style
         return null;
@@ -127,16 +123,23 @@ public class Neo4jSpatialGeoResource extends IGeoResource {
     public Neo4jSpatialGeoResourceInfo getInfo(IProgressMonitor monitor) throws IOException {
         return (Neo4jSpatialGeoResourceInfo) super.getInfo(monitor);
     }
-    
-    protected Neo4jSpatialGeoResourceInfo createInfo(IProgressMonitor monitor) throws IOException{
-        return new Neo4jSpatialGeoResourceInfo(this, monitor);
-    }
-	
-    protected String getTypeName() {
+    	
+    public String getTypeName() {
 		return typename;
 	}
 	
-	
+
+    // Private methods
+   
+    private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource(IProgressMonitor monitor) throws IOException {
+        return parent.getDataStore(monitor).getFeatureSource(typename);
+    }
+
+    protected Neo4jSpatialGeoResourceInfo createInfo(IProgressMonitor monitor) throws IOException{
+        return new Neo4jSpatialGeoResourceInfo(this, monitor);
+    }
+    
+    
 	// Attributes
 
 	private Neo4jSpatialService parent;

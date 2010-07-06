@@ -6,8 +6,13 @@ package net.refractions.udig.catalog.neo4j;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import net.refractions.udig.catalog.IService;
+import net.refractions.udig.project.ILayer;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.geotools.data.DataStore;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
@@ -67,6 +72,29 @@ public class Activator extends AbstractUIPlugin {
 		}
         
         super.stop(context);
+    }
+
+    public Neo4jSpatialService getLayerService(ILayer layer, IProgressMonitor monitor) {
+		try {
+			IService service = layer.getGeoResource().service(monitor);
+			if (service instanceof Neo4jSpatialService) {
+				return (Neo4jSpatialService) service;
+			}			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+    }
+    
+    public ILayer findLayer(String layerName, List<ILayer> layers) {
+		for (ILayer layer : layers) {
+			if (layer.getName().equals(layerName)) {
+				return layer;
+			}
+		}
+		return null;
     }
     
     public static Activator getDefault() {

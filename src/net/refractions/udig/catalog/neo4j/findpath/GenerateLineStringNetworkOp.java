@@ -1,11 +1,12 @@
 /**
  * 
  */
-package net.refractions.udig.catalog.neo4j;
+package net.refractions.udig.catalog.neo4j.findpath;
 
 import java.util.Iterator;
 import java.util.List;
 
+import net.refractions.udig.catalog.neo4j.Neo4jSpatialGeoResource;
 import net.refractions.udig.ui.operations.IOp;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,11 +29,8 @@ import org.neo4j.graphdb.Transaction;
 public class GenerateLineStringNetworkOp implements IOp {
 
 	public void op(Display display, Object target, IProgressMonitor monitor) throws Exception {
-		// monitor progress
-		if (monitor == null) {
-			monitor = new NullProgressMonitor();
-		}
-	    
+		if (monitor == null) monitor = new NullProgressMonitor();
+		
 		Neo4jSpatialGeoResource geoResource = (Neo4jSpatialGeoResource) target;
 		Neo4jSpatialDataStore dataStore = (Neo4jSpatialDataStore) geoResource.service().getDataStore(monitor);
 		SpatialDatabaseService spatialDatabase = dataStore.getSpatialDatabaseService();
@@ -45,6 +43,9 @@ public class GenerateLineStringNetworkOp implements IOp {
 			
 	        Transaction tx = dataStore.beginTx();
 	        try {
+	        	
+	        	// TODO put these layer nodes in relationship
+	        	
 	        	Layer netPointsLayer = spatialDatabase.getLayer(layer.getName() + " - network points", true);
 	        	netPointsLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
 	        	

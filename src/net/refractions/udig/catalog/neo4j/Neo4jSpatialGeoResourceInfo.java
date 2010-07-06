@@ -23,7 +23,7 @@ public class Neo4jSpatialGeoResourceInfo extends IGeoResourceInfo {
 
 	// Constructor
 	
-	Neo4jSpatialGeoResourceInfo(Neo4jSpatialGeoResource neo4jSpatialGeoResource, IProgressMonitor monitor)  throws IOException {
+	Neo4jSpatialGeoResourceInfo(Neo4jSpatialGeoResource neo4jSpatialGeoResource, IProgressMonitor monitor)  throws IOException {	
 		this.neo4jSpatialGeoResource = neo4jSpatialGeoResource;
 		
 		Neo4jSpatialDataStore dataStore = neo4jSpatialGeoResource.service().getDataStore(monitor);
