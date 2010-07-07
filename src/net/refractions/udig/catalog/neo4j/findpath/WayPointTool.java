@@ -42,6 +42,7 @@ public class WayPointTool extends SimpleTool implements Constants {
 		Neo4jSpatialService neo4jService = Activator.getDefault().getLayerService(getContext().getSelectedLayer(), monitor);
 		if (neo4jService == null) {
 			// TODO show error
+			System.out.println("select a Neo4j Point Layer");
 			return;
 		}
 

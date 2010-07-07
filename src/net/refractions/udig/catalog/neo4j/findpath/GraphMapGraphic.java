@@ -1,7 +1,6 @@
 package net.refractions.udig.catalog.neo4j.findpath;
 
 import java.awt.Color;
-import java.awt.Shape;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,11 +10,16 @@ import net.refractions.udig.project.IBlackboard;
 import net.refractions.udig.ui.graphics.ViewportGraphics;
 
 import org.neo4j.gis.spatial.SpatialDatabaseRecord;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
+/**
+ * TODO style support
+ */
 public class GraphMapGraphic implements MapGraphic, Constants {
 
 	public void draw(MapGraphicContext context) {
@@ -29,31 +33,42 @@ public class GraphMapGraphic implements MapGraphic, Constants {
         
         ViewportGraphics graphics = context.getGraphics();
 
-        for (SpatialDatabaseRecord waypoint : waypoints) {
-            if (waypoint.getGeometry() instanceof Point) {
-                Point point = (Point) waypoint.getGeometry();
-                java.awt.Point pixel = context.worldToPixel(point.getCoordinate());
-                
-                System.out.println("displaying waipont " + point + " " + pixel);
-                
-            	graphics.setColor(new Color(221, 41, 69));
-                graphics.fillRect(pixel.x - 5, pixel.y - 5, 10, 10);
-                
-                graphics.setColor(Color.BLACK);
-                // graphics.setStroke(ViewportGraphics.LINE_SOLID, 2);
-                graphics.drawRect(pixel.x - 5, pixel.y - 5, 10, 10);                
-            } else {
-            	// TODO
-            	System.out.println("NOT A POINT");
-            }
-        }
-
         graphics.setStroke(ViewportGraphics.LINE_SOLID, 3);
     	graphics.setColor(new Color(221, 41, 69));
         for (SpatialDatabaseRecord pathElement : pathElements) {
         	Geometry geometry = pathElement.getGeometry();
-        	Shape shape = context.toShape(geometry, pathElement.getCoordinateReferenceSystem());
-        	graphics.draw(shape);
+        	if (geometry.getGeometryType().equalsIgnoreCase("MultiLineString")) {
+        		for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        			drawLineString(context, graphics, geometry.getGeometryN(i), pathElement.getCoordinateReferenceSystem());
+	        	}
+	        } else if (geometry.getGeometryType().equalsIgnoreCase("LineString")) {
+    			drawLineString(context, graphics, geometry, pathElement.getCoordinateReferenceSystem());
+	        }
         }
+
+        graphics.setStroke(ViewportGraphics.LINE_SOLID, 1);
+        for (SpatialDatabaseRecord waypoint : waypoints) {
+            if (waypoint.getGeometry() instanceof Point) {
+                Point point = (Point) waypoint.getGeometry();
+                java.awt.Point pixel = context.worldToPixel(point.getCoordinate());
+ 
+            	graphics.setColor(new Color(221, 41, 69));
+                graphics.fillRect(pixel.x - 5, pixel.y - 5, 10, 10);
+                graphics.setColor(Color.BLACK);
+                graphics.drawRect(pixel.x - 5, pixel.y - 5, 10, 10);                
+            } else {
+            	// TODO log?
+            	System.out.println("This shouldn't happen: invalid waypoint " + waypoint);
+            }
+        }
+	}
+	
+	private void drawLineString(MapGraphicContext context, ViewportGraphics graphics, Geometry geometry, CoordinateReferenceSystem crs) {
+		Coordinate[] coordinates = geometry.getCoordinates();
+		for (int i = 1; i < coordinates.length; i++) {
+            java.awt.Point a = context.worldToPixel(coordinates[i - 1]);
+        	java.awt.Point b = context.worldToPixel(coordinates[i]);		
+			graphics.drawLine(a.x, a.y, b.x, b.y);
+		}
 	}
 }
