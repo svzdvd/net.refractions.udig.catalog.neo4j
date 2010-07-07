@@ -64,7 +64,7 @@ public class ShpImportWizardPage extends WizardPage {
 	    fileButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 	    	public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 	    		FileDialog fileDialog = new FileDialog(fileButton.getShell(), SWT.OPEN);
-	            fileDialog.setFilterExtensions(new String[] { "shp", "SHP" });
+	            fileDialog.setFilterExtensions(new String[] { "*.shp", "*.SHP" });
 	            String path = fileDialog.open();
 	            if (path != null) {
 	            	File f = new File(path);
