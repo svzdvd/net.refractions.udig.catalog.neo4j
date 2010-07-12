@@ -6,6 +6,7 @@ package net.refractions.udig.catalog.neo4j.findpath;
 import java.util.Iterator;
 import java.util.List;
 
+import net.refractions.udig.catalog.neo4j.Activator;
 import net.refractions.udig.catalog.neo4j.Neo4jSpatialGeoResource;
 import net.refractions.udig.ui.operations.IOp;
 
@@ -36,64 +37,73 @@ public class GenerateLineStringNetworkOp implements IOp {
 		SpatialDatabaseService spatialDatabase = dataStore.getSpatialDatabaseService();
 		Layer layer = spatialDatabase.getLayer(geoResource.getTypeName());
 
-		if (layer.getGeometryType() == Constants.GTYPE_LINESTRING ||
-			layer.getGeometryType() == Constants.GTYPE_MULTILINESTRING) {
-			
-			LineStringNetworkGenerator networkGenerator;
-			
-	        Transaction tx = dataStore.beginTx();
-	        try {
-	        	
-	        	// TODO put these layer nodes in relationship
-	        	
-	        	Layer netPointsLayer = spatialDatabase.getLayer(layer.getName() + " - network points", true);
-	        	netPointsLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
-	        	
-	        	Layer netEdgesLayer = spatialDatabase.getLayer(layer.getName() + " - network edges", true);
-	        	netEdgesLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
-	        	
-	        	networkGenerator = new LineStringNetworkGenerator(netPointsLayer, netEdgesLayer);
-	        	
-				tx.success();
-	        } finally {
-	        	tx.finish();
-	        }
-	        
-        	Search search = new SearchAll();	        	
-	        tx = dataStore.beginTx();
-	        try {
-	        	layer.getIndex().executeSearch(search);
-				tx.success();
-	        } finally {
-	        	tx.finish();
-	        }
-	        
-	        List<SpatialDatabaseRecord> results = search.getResults();
-	        monitor.beginTask("Creating Network...", results.size());
-	        try {
-		        Iterator<SpatialDatabaseRecord> it = results.iterator();
-		        while (it.hasNext()) {
-			        tx = dataStore.beginTx();
-			        try {
-			        	int worked = 0;
-			        	for (int i = 0; i < 1000 && it.hasNext(); i++) {
-			        		networkGenerator.add(it.next());
-			        		worked++;
-			        	}
-			    
-			        	monitor.worked(worked);
-			        	
-			        	tx.success();
-			        } finally {
-			        	tx.finish();
-			        }
-		        }
-	        } finally {			
-	        	monitor.done();
-	        }
-		} else {
-			// TODO show error message
-			System.out.println("Type invalid: " + layer.getGeometryType());
+		if (layer == null) {
+			Activator.log("Layer NOT found: " + layer);
+			Activator.openError(display, "Error creating Network", "Unable to retrieve Layer");
+			return;
+		} 
+		
+		Integer geomType = layer.getOrGuessGeometryType();
+		if (geomType == null) {
+			Activator.openError(display, "Error creating Network", "Unable to read Layer Geometry Type");
+			return;			
 		}
+		
+		if (geomType != Constants.GTYPE_LINESTRING && geomType != Constants.GTYPE_MULTILINESTRING) {
+			Activator.openError(display, "Error creating Network", "A Network can be created only with a (Multi) LineString Layer");			
+			return;
+		}
+			
+		LineStringNetworkGenerator networkGenerator;
+			
+	    Transaction tx = dataStore.beginTx();
+	    try {
+	    	// TODO put these layer nodes in relationship?
+	        	
+	        Layer netPointsLayer = spatialDatabase.getOrCreateLayer(layer.getName() + " - network points");
+	        netPointsLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
+	        	
+	        Layer netEdgesLayer = spatialDatabase.getOrCreateLayer(layer.getName() + " - network edges");
+	        netEdgesLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
+	        	
+	        networkGenerator = new LineStringNetworkGenerator(netPointsLayer, netEdgesLayer);
+	        	
+			tx.success();
+	    } finally {
+	    	tx.finish();
+	    }
+	        
+        Search search = new SearchAll();	        	
+	    tx = dataStore.beginTx();
+	    try {
+	    	layer.getIndex().executeSearch(search);
+			tx.success();
+	    } finally {
+	    	tx.finish();
+	    }
+	        
+	    List<SpatialDatabaseRecord> results = search.getResults();
+	    monitor.beginTask("Creating Network...", results.size());
+	    try {
+			Iterator<SpatialDatabaseRecord> it = results.iterator();
+			while (it.hasNext()) {
+				tx = dataStore.beginTx();
+				try {
+					int worked = 0;
+					for (int i = 0; i < 1000 && it.hasNext(); i++) {
+						networkGenerator.add(it.next());
+						worked++;
+					}
+
+					monitor.worked(worked);
+
+					tx.success();
+				} finally {
+					tx.finish();
+				}
+			}
+		} finally {
+			monitor.done();
+		}		
 	}
 }

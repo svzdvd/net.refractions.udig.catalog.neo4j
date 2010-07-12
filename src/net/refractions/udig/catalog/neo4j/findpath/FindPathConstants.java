@@ -1,6 +1,6 @@
 package net.refractions.udig.catalog.neo4j.findpath;
 
-public interface Constants {
+public interface FindPathConstants {
 
 	String BLACKBOARD_WAYPOINTS = "neo4j_waypoints";
 	

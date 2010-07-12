@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -37,6 +39,10 @@ public class ShpImportWizardPage extends WizardPage {
         
         Group dirInputGroup = createGroup(area, "Neo4j Database Directory");
         final Text dirText = createTextField(dirInputGroup);
+        dirText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				setNeo4jDir(dirText.getText());
+			}});
         final Button dirButton = new Button(dirInputGroup, SWT.PUSH);
         dirButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
         dirButton.setText("...");
@@ -44,20 +50,16 @@ public class ShpImportWizardPage extends WizardPage {
             public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
             	DirectoryDialog dirDialog = new DirectoryDialog(dirButton.getShell(), SWT.OPEN);
                 String path = dirDialog.open();
-                if (path != null) {
-                    File f = new File(path);
-                    if (f.exists()) {
-                    	dirText.setText(path);
-                    	neo4jDir = f;
-                    	neo4jDirPath = path;
-                    } 
-                }
-                checkFinish();
+                dirText.setText(path);
             }
         });
         
         Group fileInputGroup = createGroup(area, "SHP file");
 	    final Text fileText = createTextField(fileInputGroup);
+	    fileText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				setShpFile(fileText.getText());
+			}});
 	    final Button fileButton = new Button(fileInputGroup, SWT.PUSH);
 	    fileButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 	    fileButton.setText("...");
@@ -66,20 +68,7 @@ public class ShpImportWizardPage extends WizardPage {
 	    		FileDialog fileDialog = new FileDialog(fileButton.getShell(), SWT.OPEN);
 	            fileDialog.setFilterExtensions(new String[] { "*.shp", "*.SHP" });
 	            String path = fileDialog.open();
-	            if (path != null) {
-	            	File f = new File(path);
-	                if (f.exists()) {
-	                	fileText.setText(path);
-	                    shpFile = f;
-	                    shpFilePath = path;
-	                    
-	                    String layerName = shpFilePath;
-	                    layerName = layerName.substring(0, layerName.lastIndexOf("."));
-	        	        layerName = layerName.substring(layerName.lastIndexOf(File.separator) + 1);
-	        	        layerNameField.setText(layerName);
-	                } 
-	            }
-	            checkFinish();
+	            fileText.setText(path);
 	        }
 	    });
 	    
@@ -105,8 +94,43 @@ public class ShpImportWizardPage extends WizardPage {
         return shpFilePath;
     }
     
+    private void setShpFile(String path) {
+        shpFile = null;
+        shpFilePath = null;
+    	
+        if (path != null) {
+        	File f = new File(path);
+            if (f.exists()) {
+                shpFile = f;
+                shpFilePath = path;
+                
+                String layerName = shpFilePath;
+                layerName = layerName.substring(0, layerName.lastIndexOf("."));
+    	        layerName = layerName.substring(layerName.lastIndexOf(File.separator) + 1);
+    	        layerNameField.setText(layerName);
+            } 
+        }    	
+        
+    	checkFinish();
+    }
+    
     public String getNeo4jDir() {
     	return neo4jDirPath;
+    }
+    
+    private void setNeo4jDir(String path) {
+    	neo4jDir = null;
+    	neo4jDirPath = null;
+    	
+        if (path != null) {
+            File f = new File(path);
+            if (f.exists()) {
+            	neo4jDir = f;
+            	neo4jDirPath = path;
+            } 
+        }    	
+        
+    	checkFinish();
     }
     
     

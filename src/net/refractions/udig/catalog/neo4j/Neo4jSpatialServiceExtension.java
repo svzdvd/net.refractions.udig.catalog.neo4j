@@ -70,7 +70,7 @@ public class Neo4jSpatialServiceExtension extends AbstractDataStoreServiceExtens
 	}
 
 	public String reasonForFailure(URL url) {
-		// TODO
+		// TODO reasonForFailure(URL url)
 		return "";
 	}
 
@@ -86,7 +86,7 @@ public class Neo4jSpatialServiceExtension extends AbstractDataStoreServiceExtens
 			}
 
 			public DataStore createNewDataStore(Map<String, Serializable> params) throws IOException {
-				// TODO
+				// TODO createNewDataStore
 				throw new UnsupportedOperationException();
 			}
 

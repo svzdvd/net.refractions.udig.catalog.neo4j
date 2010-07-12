@@ -13,6 +13,8 @@ import net.refractions.udig.catalog.IService;
 import net.refractions.udig.project.ILayer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.geotools.data.DataStore;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
@@ -48,7 +50,7 @@ public class Activator extends AbstractUIPlugin {
 	    			dataStore = (Neo4jSpatialDataStore) dataStorefactory.createDataStore(params);					
 	    			openDataStores.put(id, dataStore);
 	    			
-	        		System.out.println("Opened Neo4j Database: " + id);
+	        		log("Opened Neo4j Database: " + id);
 				}
 				return dataStore;
     		}
@@ -66,7 +68,8 @@ public class Activator extends AbstractUIPlugin {
         		DataStore dataStore = openDataStores.get(id);
         		dataStore.dispose();
         		
-        		System.out.println("Closed Neo4j Database: " + id);
+        		// TODO log is already stopped? it throws NPE...
+        		log("Closed Neo4j Database: " + id);
         	}
         	openDataStores.clear();
 		}
@@ -81,8 +84,7 @@ public class Activator extends AbstractUIPlugin {
 				return (Neo4jSpatialService) service;
 			}			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log(e.getMessage(), e);
 		}
 
 		return null;
@@ -100,8 +102,30 @@ public class Activator extends AbstractUIPlugin {
     public static Activator getDefault() {
         return plugin;
     }
+
+    public static void openError(final Display display, final String title, final String message) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openError(
+						display.getActiveShell(),
+						title,
+						message);
+			}});    	
+    }
     
+    public static void log(String message) {
+    	System.out.println(message);
+        // TODO getDefault().getLog().log(new Status(IStatus.INFO, ID, message));
+    }        
+    
+    public static void log(String message, Throwable t) {
+    	t.printStackTrace();
+    	System.out.println(message);
+        // int status = t instanceof Exception || message != null ? IStatus.ERROR : IStatus.WARNING;
+        // TODO getDefault().getLog().log(new Status(status, ID, IStatus.OK, message, t));
+    }    
 	
+    
 	// Attributes
 
     private Map<String,Neo4jSpatialDataStore> openDataStores;

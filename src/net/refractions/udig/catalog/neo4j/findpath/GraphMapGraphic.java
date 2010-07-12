@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 
+import net.refractions.udig.catalog.neo4j.Activator;
 import net.refractions.udig.mapgraphic.MapGraphic;
 import net.refractions.udig.mapgraphic.MapGraphicContext;
 import net.refractions.udig.project.IBlackboard;
@@ -20,7 +21,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * TODO style support
  */
-public class GraphMapGraphic implements MapGraphic, Constants {
+public class GraphMapGraphic implements MapGraphic, FindPathConstants {
 
 	public void draw(MapGraphicContext context) {
 		IBlackboard mapboard = context.getMap().getBlackboard();
@@ -57,8 +58,7 @@ public class GraphMapGraphic implements MapGraphic, Constants {
                 graphics.setColor(Color.BLACK);
                 graphics.drawRect(pixel.x - 5, pixel.y - 5, 10, 10);                
             } else {
-            	// TODO log?
-            	System.out.println("This shouldn't happen: invalid waypoint " + waypoint);
+            	Activator.log("This shouldn't happen: invalid waypoint " + waypoint);
             }
         }
 	}

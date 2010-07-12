@@ -13,6 +13,7 @@ import net.refractions.udig.ui.PlatformGIS;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Display;
 import org.neo4j.gis.spatial.Layer;
 import org.neo4j.gis.spatial.SpatialDatabaseRecord;
 import org.neo4j.gis.spatial.SpatialDatabaseService;
@@ -29,7 +30,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 
-public class FindPathTool extends AbstractActionTool implements Constants {
+public class FindPathTool extends AbstractActionTool implements FindPathConstants {
 
 	// Public methods
 	
@@ -37,29 +38,33 @@ public class FindPathTool extends AbstractActionTool implements Constants {
 	}	
 	
 	public void run() {
+		Display display = getContext().getViewportPane().getControl().getDisplay();
 		final IBlackboard mapboard = getContext().getMap().getBlackboard();
 		
         // get waypoints from blackboard
         if (!mapboard.contains(BLACKBOARD_WAYPOINTSLAYER) || !mapboard.contains(BLACKBOARD_WAYPOINTS)) {
-        	// TODO show error
+			Activator.openError(display, "Error finding Path", "Please select at least two WayPoints");	
             return;
         }
 
         final SpatialDatabaseRecord[] waypoints = ((ArrayList<SpatialDatabaseRecord>) mapboard.get(BLACKBOARD_WAYPOINTS)).toArray(new SpatialDatabaseRecord[] {});
         if (waypoints.length < 2) {
-        	// TODO show error
+			Activator.openError(display, "Error finding Path", "Please select at least two WayPoints");	
             return;
         }
         
 		final ILayer pointsLayer = Activator.getDefault().findLayer(mapboard.getString(BLACKBOARD_WAYPOINTSLAYER), getContext().getMapLayers());
 		if (pointsLayer == null) {
-        	// TODO show error
+        	// this shouldn't happen
+			Activator.openError(display, "Error finding Path", "Unable to retrieve Layer");			
             return;
 		}
-
+		
         // run with backgroundable progress monitoring
         IRunnableWithProgress operation = new IRunnableWithProgress() {
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            	Display display = getContext().getViewportPane().getControl().getDisplay();
+            	
             	Neo4jSpatialService neo4jService = Activator.getDefault().getLayerService(pointsLayer, monitor);
 				Neo4jSpatialDataStore dataStore = (Neo4jSpatialDataStore) neo4jService.getDataStore(monitor);
 
@@ -68,6 +73,12 @@ public class FindPathTool extends AbstractActionTool implements Constants {
 				Transaction tx = databaseService.beginTx();
 				try {
 					List<SpatialDatabaseRecord> pathRecords = new ArrayList<SpatialDatabaseRecord>();
+					
+					mapboard.put(BLACKBOARD_PATH, pathRecords);
+					
+					// TODO don't delete waypoints automatically, create a tool for this purpose
+					((ArrayList<SpatialDatabaseRecord>) mapboard.get(BLACKBOARD_WAYPOINTS)).clear();					
+					
 					for (int i = 1; i < waypoints.length; i++) {
 				        SpatialDatabaseRecord one = waypoints[i - 1];
 				        SpatialDatabaseRecord two = waypoints[i];
@@ -98,26 +109,26 @@ public class FindPathTool extends AbstractActionTool implements Constants {
 							SpatialRelationshipTypes.NETWORK);
 						
 						List<Node> pathNodes = sp.getPathAsNodes();
-						for (Node geomNode : pathNodes) {
-							// TODO cache Layer data
-							Layer layer = spatialDatabaseService.findLayerContainingGeometryNode(geomNode);
-							pathRecords.add(new SpatialDatabaseRecord(layer.getName(), layer.getGeometryEncoder(), layer.getCoordinateReferenceSystem(), layer.getExtraPropertyNames(), geomNode));
-				        }
+						if (pathNodes != null) {
+							for (Node geomNode : pathNodes) {
+								// TODO cache Layer data
+								Layer layer = spatialDatabaseService.findLayerContainingGeometryNode(geomNode);
+								pathRecords.add(new SpatialDatabaseRecord(layer.getName(), layer.getGeometryEncoder(), layer.getCoordinateReferenceSystem(), layer.getExtraPropertyNames(), geomNode));
+							}
+						}
 					}
 						
-					mapboard.put(BLACKBOARD_PATH, pathRecords);
-						
-					// TODO don't delete waypoints automatically, create a tool for this purpose
-					((ArrayList<SpatialDatabaseRecord>) mapboard.get(BLACKBOARD_WAYPOINTS)).clear();
-						
 					tx.success();
+				} catch (Exception e) {
+					Activator.log(e.getMessage(), e);
+					Activator.openError(display, "Error finding Path", "Unable to find Path");								
 				} finally {
 					tx.finish();
-				}				            	
-	            	
-				// TODO duplicated code
-				ILayer layer = Activator.getDefault().findLayer("Neo4j Network", getContext().getMapLayers());
-				if (layer != null) layer.refresh(getContext().getViewportModel().getBounds());
+					
+					// TODO duplicated code
+					ILayer layer = Activator.getDefault().findLayer("Neo4j Network", getContext().getMapLayers());
+					if (layer != null) layer.refresh(getContext().getViewportModel().getBounds());
+				}
 			}
         };
         PlatformGIS.runInProgressDialog("Finding shortest path...", true, operation, true);
