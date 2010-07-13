@@ -67,7 +67,8 @@
             icon="icons/etool16/graph.png"
             id="net.refractions.udig.catalog.neo4j.waypointtool"
             name="Add Way Point"
-            onToolbar="true">
+            onToolbar="true"
+            tooltip="Add Way Point">
       </modalTool>
       <actionTool
             class="net.refractions.udig.catalog.neo4j.findpath.FindPathTool"
