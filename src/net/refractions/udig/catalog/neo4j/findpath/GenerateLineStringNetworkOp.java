@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.neo4j.gis.spatial.Constants;
+import org.neo4j.gis.spatial.DefaultLayer;
+import org.neo4j.gis.spatial.EditableLayer;
 import org.neo4j.gis.spatial.Layer;
 import org.neo4j.gis.spatial.LineStringNetworkGenerator;
 import org.neo4j.gis.spatial.Search;
@@ -43,7 +45,7 @@ public class GenerateLineStringNetworkOp implements IOp {
 			return;
 		} 
 		
-		Integer geomType = layer.getOrGuessGeometryType();
+		Integer geomType = layer.getGeometryType();
 		if (geomType == null) {
 			Activator.openError(display, "Error creating Network", "Unable to read Layer Geometry Type");
 			return;			
@@ -55,23 +57,23 @@ public class GenerateLineStringNetworkOp implements IOp {
 		}
 			
 		LineStringNetworkGenerator networkGenerator;
-			
-	    Transaction tx = dataStore.beginTx();
-	    try {
-	    	// TODO put these layer nodes in relationship?
-	        	
-	        Layer netPointsLayer = spatialDatabase.getOrCreateLayer(layer.getName() + " - network points");
-	        netPointsLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
-	        	
-	        Layer netEdgesLayer = spatialDatabase.getOrCreateLayer(layer.getName() + " - network edges");
-	        netEdgesLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
-	        	
-	        networkGenerator = new LineStringNetworkGenerator(netPointsLayer, netEdgesLayer);
-	        	
+
+		Transaction tx = dataStore.beginTx();
+		try {
+			// TODO put these layer nodes in relationship?
+
+			EditableLayer netPointsLayer = spatialDatabase.getOrCreateEditableLayer(layer.getName() + " - network points");
+			netPointsLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
+
+			EditableLayer netEdgesLayer = spatialDatabase.getOrCreateEditableLayer(layer.getName() + " - network edges");
+			netEdgesLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
+
+			networkGenerator = new LineStringNetworkGenerator(netPointsLayer, netEdgesLayer);
+
 			tx.success();
-	    } finally {
-	    	tx.finish();
-	    }
+		} finally {
+			tx.finish();
+		}
 	        
         Search search = new SearchAll();	        	
 	    tx = dataStore.beginTx();

@@ -10,7 +10,8 @@ Require-Bundle: net.refractions.udig.libs;bundle-version="1.2.0",
  net.refractions.udig.catalog;bundle-version="1.2.0",
  net.refractions.udig.catalog.ui;bundle-version="1.2.0",
  net.refractions.udig.project.ui;bundle-version="1.2.0",
- net.refractions.udig.mapgraphic;bundle-version="1.2.0"
+ net.refractions.udig.mapgraphic;bundle-version="1.2.0",
+ net.refractions.udig;bundle-version="1.2.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: net.refractions.udig.catalog.neo4j.Activator
 Bundle-ActivationPolicy: lazy
