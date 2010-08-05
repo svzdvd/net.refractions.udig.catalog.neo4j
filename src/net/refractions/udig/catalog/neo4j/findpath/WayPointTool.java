@@ -64,7 +64,7 @@ public class WayPointTool extends SimpleTool implements FindPathConstants {
 		try {
 			Layer layer = spatialDatabase.getLayer(getContext().getSelectedLayer().getName());
 
-			Integer geomType = layer.getOrGuessGeometryType();
+			Integer geomType = layer.getGeometryType();
 			if (geomType == null) {
 				Activator.openError(display, "Error creating WayPoint", "Unable to read Layer Geometry Type");
 				return;			

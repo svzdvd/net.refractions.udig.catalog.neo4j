@@ -84,7 +84,8 @@ public class ShpImportWizard extends Wizard implements INewWizard {
         	        params.put(Neo4jSpatialDataStoreFactory.URLP.key, URLUtils.fileToURL(new File(neo4jPath)));
     	        	
         	        Neo4jSpatialDataStore dataStore = Activator.getDefault().getDataStore(params);
-            		ShapefileImporter importer = new ShapefileImporter(dataStore.getSpatialDatabaseService().getDatabase(), new ProgressMonitorWrapper("Importing...", monitor));
+            		ShapefileImporter importer = new ShapefileImporter(
+            				dataStore.getSpatialDatabaseService().getDatabase(), new ProgressMonitorWrapper("Importing...", monitor), 1000);
         	    	importer.importFile(shpPath, layerName);
 				} catch (Throwable e) {
 					e.printStackTrace();

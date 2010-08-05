@@ -14,11 +14,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.neo4j.gis.spatial.Constants;
+import org.neo4j.gis.spatial.DefaultLayer;
 import org.neo4j.gis.spatial.Layer;
 import org.neo4j.gis.spatial.LineStringNetworkGenerator;
 import org.neo4j.gis.spatial.Search;
 import org.neo4j.gis.spatial.SpatialDatabaseRecord;
 import org.neo4j.gis.spatial.SpatialDatabaseService;
+import org.neo4j.gis.spatial.WKBGeometryEncoder;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
 import org.neo4j.gis.spatial.query.SearchAll;
 import org.neo4j.graphdb.Transaction;
@@ -43,7 +45,7 @@ public class GenerateLineStringNetworkOp implements IOp {
 			return;
 		} 
 		
-		Integer geomType = layer.getOrGuessGeometryType();
+		Integer geomType = layer.getGeometryType();
 		if (geomType == null) {
 			Activator.openError(display, "Error creating Network", "Unable to read Layer Geometry Type");
 			return;			
@@ -60,10 +62,10 @@ public class GenerateLineStringNetworkOp implements IOp {
 	    try {
 	    	// TODO put these layer nodes in relationship?
 	        	
-	        Layer netPointsLayer = spatialDatabase.getOrCreateLayer(layer.getName() + " - network points");
+	        DefaultLayer netPointsLayer = (DefaultLayer) spatialDatabase.getOrCreateLayer(layer.getName() + " - network points", WKBGeometryEncoder.class, DefaultLayer.class);
 	        netPointsLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
 	        	
-	        Layer netEdgesLayer = spatialDatabase.getOrCreateLayer(layer.getName() + " - network edges");
+	        DefaultLayer netEdgesLayer = (DefaultLayer) spatialDatabase.getOrCreateLayer(layer.getName() + " - network edges", WKBGeometryEncoder.class, DefaultLayer.class);
 	        netEdgesLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
 	        	
 	        networkGenerator = new LineStringNetworkGenerator(netPointsLayer, netEdgesLayer);
