@@ -37,7 +37,7 @@ public class GenerateLineStringNetworkOp implements IOp {
 		Neo4jSpatialGeoResource geoResource = (Neo4jSpatialGeoResource) target;
 		Neo4jSpatialDataStore dataStore = (Neo4jSpatialDataStore) geoResource.service().getDataStore(monitor);
 		SpatialDatabaseService spatialDatabase = dataStore.getSpatialDatabaseService();
-		Layer layer = spatialDatabase.getLayer(geoResource.getTypeName());
+		DefaultLayer layer = (DefaultLayer) spatialDatabase.getLayer(geoResource.getTypeName());
 
 		if (layer == null) {
 			Activator.log("Layer NOT found: " + layer);
@@ -45,7 +45,7 @@ public class GenerateLineStringNetworkOp implements IOp {
 			return;
 		} 
 		
-		Integer geomType = layer.getGeometryType();
+		Integer geomType = layer.getOrGuessGeometryType();
 		if (geomType == null) {
 			Activator.openError(display, "Error creating Network", "Unable to read Layer Geometry Type");
 			return;			
