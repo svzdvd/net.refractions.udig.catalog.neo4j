@@ -19,10 +19,10 @@ import org.neo4j.gis.spatial.SpatialDatabaseRecord;
 import org.neo4j.gis.spatial.SpatialDatabaseService;
 import org.neo4j.gis.spatial.SpatialRelationshipTypes;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
-import org.neo4j.graphalgo.shortestpath.CostEvaluator;
-import org.neo4j.graphalgo.shortestpath.Dijkstra;
-import org.neo4j.graphalgo.shortestpath.std.DoubleAdder;
-import org.neo4j.graphalgo.shortestpath.std.DoubleComparator;
+import org.neo4j.graphalgo.CostEvaluator;
+import org.neo4j.graphalgo.impl.shortestpath.Dijkstra;
+import org.neo4j.graphalgo.impl.util.DoubleAdder;
+import org.neo4j.graphalgo.impl.util.DoubleComparator;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -92,9 +92,9 @@ public class FindPathTool extends AbstractActionTool implements FindPathConstant
 							startNode, 
 							endNode, 
 							new CostEvaluator<Double>() {
-								public Double getCost(Relationship relationship, boolean backwards) {
+								public Double getCost(Relationship relationship, Direction direction) {
 									Node startNode = relationship.getStartNode();											
-									if (backwards) {
+									if (direction.equals(Direction.INCOMING)) {
 										// TODO use a constant name
 										// TODO if property doesn't exists, decode geometry and calculate it
 										return (Double) startNode.getProperty("_network_length");

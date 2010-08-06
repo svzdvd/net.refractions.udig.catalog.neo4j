@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.widgets.Display;
 import org.neo4j.gis.spatial.Constants;
-import org.neo4j.gis.spatial.Layer;
+import org.neo4j.gis.spatial.DefaultLayer;
 import org.neo4j.gis.spatial.SpatialDatabaseRecord;
 import org.neo4j.gis.spatial.SpatialDatabaseService;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
@@ -62,7 +62,7 @@ public class WayPointTool extends SimpleTool implements FindPathConstants {
 		SpatialDatabaseService spatialDatabase = dataStore.getSpatialDatabaseService();
 		Transaction tx = spatialDatabase.getDatabase().beginTx();
 		try {
-			Layer layer = spatialDatabase.getLayer(getContext().getSelectedLayer().getName());
+			DefaultLayer layer = (DefaultLayer) spatialDatabase.getLayer(getContext().getSelectedLayer().getName());
 
 			Integer geomType = layer.getGeometryType();
 			if (geomType == null) {

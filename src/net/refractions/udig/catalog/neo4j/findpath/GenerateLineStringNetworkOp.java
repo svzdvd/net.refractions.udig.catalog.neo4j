@@ -21,6 +21,7 @@ import org.neo4j.gis.spatial.LineStringNetworkGenerator;
 import org.neo4j.gis.spatial.Search;
 import org.neo4j.gis.spatial.SpatialDatabaseRecord;
 import org.neo4j.gis.spatial.SpatialDatabaseService;
+import org.neo4j.gis.spatial.WKBGeometryEncoder;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
 import org.neo4j.gis.spatial.query.SearchAll;
 import org.neo4j.graphdb.Transaction;
@@ -37,7 +38,7 @@ public class GenerateLineStringNetworkOp implements IOp {
 		Neo4jSpatialGeoResource geoResource = (Neo4jSpatialGeoResource) target;
 		Neo4jSpatialDataStore dataStore = (Neo4jSpatialDataStore) geoResource.service().getDataStore(monitor);
 		SpatialDatabaseService spatialDatabase = dataStore.getSpatialDatabaseService();
-		Layer layer = spatialDatabase.getLayer(geoResource.getTypeName());
+		DefaultLayer layer = (DefaultLayer) spatialDatabase.getLayer(geoResource.getTypeName());
 
 		if (layer == null) {
 			Activator.log("Layer NOT found: " + layer);
