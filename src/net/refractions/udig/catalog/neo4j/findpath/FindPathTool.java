@@ -30,6 +30,11 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 
+/**
+ * Tool to find the shortest path between selected waypoints, using Dijkstra algorithm.
+ * 
+ * @author Davide Savazzi
+ */
 public class FindPathTool extends AbstractActionTool implements FindPathConstants {
 
 	// Public methods

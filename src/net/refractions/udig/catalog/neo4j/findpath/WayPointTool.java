@@ -26,6 +26,8 @@ import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
+ * Tool to select waypoints on the map.
+ * 
  * @author Davide Savazzi
  */
 public class WayPointTool extends SimpleTool implements FindPathConstants {
