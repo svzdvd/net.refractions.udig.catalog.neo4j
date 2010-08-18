@@ -14,6 +14,8 @@ import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
 
 
 /**
+ * IOp implementation to completely delete a Neo4j Layer.
+ * 
  * @author Davide Savazzi
  */
 public class DeleteNeo4jSpatialLayerOp implements IOp {

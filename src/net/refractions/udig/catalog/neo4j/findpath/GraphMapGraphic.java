@@ -19,6 +19,8 @@ import com.vividsolutions.jts.geom.Point;
 
 
 /**
+ * MapGraphic that draws selected waypoints and the shortest path found between them.
+ * 
  * TODO style support
  */
 public class GraphMapGraphic implements MapGraphic, FindPathConstants {

@@ -6,6 +6,9 @@ import org.neo4j.gis.spatial.Listener;
 
 
 /**
+ * Implementation of a Neo4j-Spatial Listener that 
+ * manage an Eclipse IProgressMonitor implementation.
+ * 
  * @author Davide Savazzi
  */
 public class ProgressMonitorWrapper implements Listener {

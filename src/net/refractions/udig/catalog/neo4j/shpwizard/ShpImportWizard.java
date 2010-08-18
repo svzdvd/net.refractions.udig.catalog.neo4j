@@ -28,6 +28,8 @@ import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStoreFactory;
 
 
 /**
+ * Wizard to import a Shapefile in a Neo4j DataStore.
+ * 
  * @author Davide Savazzi
  */
 public class ShpImportWizard extends Wizard implements INewWizard {

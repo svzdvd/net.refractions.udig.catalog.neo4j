@@ -16,18 +16,18 @@ import org.eclipse.swt.widgets.Display;
 import org.neo4j.gis.spatial.Constants;
 import org.neo4j.gis.spatial.DefaultLayer;
 import org.neo4j.gis.spatial.EditableLayer;
-import org.neo4j.gis.spatial.Layer;
 import org.neo4j.gis.spatial.LineStringNetworkGenerator;
 import org.neo4j.gis.spatial.Search;
 import org.neo4j.gis.spatial.SpatialDatabaseRecord;
 import org.neo4j.gis.spatial.SpatialDatabaseService;
-import org.neo4j.gis.spatial.WKBGeometryEncoder;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
 import org.neo4j.gis.spatial.query.SearchAll;
 import org.neo4j.graphdb.Transaction;
 
 
 /**
+ * IOp implementation to create a network of LineStrings.
+ * 
  * @author Davide Savazzi
  */
 public class GenerateLineStringNetworkOp implements IOp {
@@ -63,9 +63,11 @@ public class GenerateLineStringNetworkOp implements IOp {
 		try {
 			// TODO put these layer nodes in relationship?
 
+			// create Network Points Layer
 			EditableLayer netPointsLayer = spatialDatabase.getOrCreateEditableLayer(layer.getName() + " - network points");
 			netPointsLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
 
+			// create Network Edges Layer
 			EditableLayer netEdgesLayer = spatialDatabase.getOrCreateEditableLayer(layer.getName() + " - network edges");
 			netEdgesLayer.setCoordinateReferenceSystem(layer.getCoordinateReferenceSystem());
 

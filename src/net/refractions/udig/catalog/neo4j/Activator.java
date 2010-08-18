@@ -31,6 +31,9 @@ import org.osgi.framework.BundleContext;
 
 
 /**
+ * Neo4j Plugin Activator. 
+ * It mantains an index of open Neo4j DataStores. 
+ * 
  * @author Davide Savazzi
  */
 public class Activator extends AbstractUIPlugin implements IStartup {
@@ -48,6 +51,9 @@ public class Activator extends AbstractUIPlugin implements IStartup {
 
     // Public methods
     
+	/**
+	 * Return a Neo4j DataStore.
+	 */
 	public Neo4jSpatialDataStore getDataStore(Map<String, Serializable> params) throws IOException {
 		if (dataStorefactory.canProcess(params)) {
 			String id = dataStorefactory.getDataStoreUniqueIdentifier(params);
@@ -67,6 +73,9 @@ public class Activator extends AbstractUIPlugin implements IStartup {
 		}
 	}
 	
+	/**
+	 * Close all open DataStores.
+	 */
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         
@@ -74,9 +83,6 @@ public class Activator extends AbstractUIPlugin implements IStartup {
         	for (String id : openDataStores.keySet()) {
         		DataStore dataStore = openDataStores.get(id);
         		dataStore.dispose();
-        		
-        		// TODO log is already stopped? it throws NPE...
-        		log("Closed Neo4j Database: " + id);
         	}
         	openDataStores.clear();
 		}
@@ -106,10 +112,16 @@ public class Activator extends AbstractUIPlugin implements IStartup {
 		return null;
     }
     
+    /**
+     * Return a static reference to this Activator
+     */
     public static Activator getDefault() {
         return plugin;
     }
 
+    /**
+     * Open an Error Message Dialog
+     */
     public static void openError(final Display display, final String title, final String message) {
 		display.asyncExec(new Runnable() {
 			public void run() {

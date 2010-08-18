@@ -84,6 +84,9 @@ public class Neo4jSpatialService extends IService {
         return params;
     }
     
+    /**
+     * Clear Neo4j Datastore cache.
+     */
     public void refresh(IProgressMonitor monitor) {
 		Neo4jSpatialDataStore dataStore = (Neo4jSpatialDataStore) getDataStore(monitor);
 		dataStore.clearCache();    	

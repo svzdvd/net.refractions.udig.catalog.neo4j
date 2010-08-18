@@ -7,6 +7,9 @@ import org.eclipse.swt.widgets.Display;
 
 
 /**
+ * IOp implementation to refresh a Neo4j DataStore.
+ * Useful after Layer creation or deletion, it deletes Neo4j DataStore internal cache.
+ * 
  * @author Davide Savazzi
  */
 public class RefreshNeo4jSpatialServiceOp implements IOp {
