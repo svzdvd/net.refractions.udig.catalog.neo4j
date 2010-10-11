@@ -118,7 +118,7 @@ public class FindPathTool extends AbstractActionTool implements FindPathConstant
 							for (Node geomNode : pathNodes) {
 								// TODO cache Layer data
 								Layer layer = spatialDatabaseService.findLayerContainingGeometryNode(geomNode);
-								pathRecords.add(new SpatialDatabaseRecord(layer.getName(), layer.getGeometryEncoder(), layer.getCoordinateReferenceSystem(), layer.getExtraPropertyNames(), geomNode));
+								pathRecords.add(new SpatialDatabaseRecord(layer, geomNode));
 							}
 						}
 					}

@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.geotools.data.DataStore;
+import org.json.simple.JSONObject;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStore;
 import org.neo4j.gis.spatial.geotools.data.Neo4jSpatialDataStoreFactory;
 import org.osgi.framework.BundleContext;
@@ -32,7 +33,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * Neo4j Plugin Activator. 
- * It mantains an index of open Neo4j DataStores. 
+ * It maintains an index of open Neo4j DataStores. 
  * 
  * @author Davide Savazzi
  */
@@ -47,6 +48,7 @@ public class Activator extends AbstractUIPlugin implements IStartup {
         openDataStores = new HashMap<String,Neo4jSpatialDataStore>();
         dataStorefactory = new Neo4jSpatialDataStoreFactory();
         plugin = this;
+        JSONObject query = new JSONObject();
     }
 
     // Public methods

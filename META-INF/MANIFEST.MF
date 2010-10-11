@@ -3,18 +3,21 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Neo4j Catalog Plug-in
 Bundle-SymbolicName: net.refractions.udig.catalog.neo4j;singleton:=true
 Bundle-Version: 1.0.0
-Require-Bundle: net.refractions.udig.libs;bundle-version="1.2.0",
+Require-Bundle: net.refractions.udig.libs,
  org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.5.2",
  net.refractions.udig.catalog;bundle-version="1.2.0",
  net.refractions.udig.catalog.ui;bundle-version="1.2.0",
  net.refractions.udig.project.ui;bundle-version="1.2.0",
  net.refractions.udig.mapgraphic;bundle-version="1.2.0",
- net.refractions.udig;bundle-version="1.2.0"
+ net.refractions.udig;bundle-version="1.2.0",
+ org.neo4j.spatial.libs;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: net.refractions.udig.catalog.neo4j.Activator
 Bundle-ActivationPolicy: lazy
-Import-Package: org.neo4j.gis.spatial,
+Import-Package: org.json.simple,
+ org.json.simple.parser,
+ org.neo4j.gis.spatial,
  org.neo4j.gis.spatial.geotools.data,
  org.neo4j.gis.spatial.osm,
  org.neo4j.gis.spatial.query,
